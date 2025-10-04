@@ -8,7 +8,54 @@ on:
     branches: main
 
 jobs:
+  test_expressions:
+    name: "Job to test expressions"
+    runs-on: ubuntu-latest
+    env:
+      aBoolean: ${{ false }}
+      aNull: ${{ null }}
+      aNumber: ${{ 42 }}
+      aString: this is a string data type variable
+    steps:
+      - name: test null
+        if: (env.aNull == null)
+        run: echo This is a variable of null data type
+      - name: test boolean variable
+        if: ${{ fromJSON(env.aBoolean) }}
+        run: echo This is a boolean variable with value true
+      - name: test contains() function
+        if: ${{ contains(env.aString, 'this') }}
+        run: |
+          echo This is a variable of string data type and contain the string this
+          echos This will cause the job to fail as it is not a valid command
+      - name: test status check and format function
+        if: ${{ failure() }}
+        env:
+          FORMAT_VAR: ${{ format(Github {0} {1} {2} {3}, 'actions', 'are', 'pretty', 'good') }}
+        run: |
+          echo "This step is used to cleanup all the resources after workflow failure"
+          echo "This marks the end of the workflow"
+          echo ${{ env.FORMAT_VAR }}
+      - name: function and status check
+        if: ${{ startsWith(env.aString, 'this') && always() }}
+        run: sleep 30
+      - name: test cancel and status check
+        if: ${{ cancelled() }}
+        run: echo "This step runs if the workflow is cancelled and can also be used to clean-up scripts"
+
+          
+      # - name: test boolean
+      #   if: (env.aBoolean == false)
+      #   run: echo This is a variable of data type boolean and is false
+      # - name: test number
+      #   if: (env.aNumber == 42)
+      #   run: echo This is a variable of data type number with value 42
+      # - name: test string
+      #   if: (env.aString == "this is a string data type variable")
+      #   run: echo This is a variable of string data type
+      
   test_variables:
+    if: (github.event_name == 'pull_request')
     env:
       JOB_VAR: "This is a job level variable"
     name: test job to test variables and secrets
