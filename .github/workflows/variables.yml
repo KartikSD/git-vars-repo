@@ -31,7 +31,7 @@ jobs:
       - name: test status check and format function
         if: ${{ failure() }}
         env:
-          FORMAT_VAR: ${{ format(Github {0} {1} {2} {3}, 'actions', 'are', 'pretty', 'good') }}
+          FORMAT_VAR: ${{ format('Github {0} {1} {2} {3}', 'actions', 'are', 'pretty', 'good') }}
         run: |
           echo "This step is used to cleanup all the resources after workflow failure"
           echo "This marks the end of the workflow"
